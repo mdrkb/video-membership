@@ -3,6 +3,7 @@
 [![Dependencies](https://img.shields.io/badge/Python-3.8.5-blue.svg)]()
 [![Dependencies](https://img.shields.io/badge/FastAPI-0.70.1-green.svg)]()
 [![Dependencies](https://img.shields.io/badge/NoSQL-Cassandra-red.svg)]()
+[![Dependencies](https://img.shields.io/badge/Template-Jinja2-red.svg)]()
 
 ## Create Virutal Environment:
 ```
