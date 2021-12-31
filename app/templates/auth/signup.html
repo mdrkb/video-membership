@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block head_title %}
+Signup | {{ super() }}
+{% endblock %}
+
+{% block content %}
+<h1>Signup</h1>
+
+{% include "snippets/form_errors.html" %}
+
+<form method="post">
+    <div>
+        <label for="email">Email</label>
+        <input type="email" name="email" placeholder="your@email.com"/>
+    </div>
+    <div>
+        <label for="password">Password</label>
+        <input type="password" name="password" placeholder="your password"/>
+    </div>
+    <div>
+        <label for="password_confirm">Confirm Password</label>
+        <input type="password" name="password_confirm" placeholder="confirm your password"/>
+    </div>
+    <button type="submit">Login</button>
+</form>
+{% endblock %}
+
