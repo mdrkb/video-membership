@@ -1,21 +1,12 @@
-import json
-
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
-# from app import config
 from cassandra.cqlengine.management import sync_table
 from app.users.models import User
 from app import db, utils
-import pathlib
-from fastapi.templating import Jinja2Templates
 from app.users.schemas import UserSIgnUpSchema, UserLoginSchema
-
-BASE_DIR = pathlib.Path(__file__).resolve().parent
-TEMPLATE_DIR = BASE_DIR / "templates"
+from app.shortcuts import render
 
 app = FastAPI()
-# settings = config.get_settings()
-templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 DB_SESSION = None
 
 
@@ -28,18 +19,13 @@ def on_startup():
 
 @app.get("/", response_class=HTMLResponse)
 def homepage(request: Request):
-    context = {
-        "request": request
-    }
-    return templates.TemplateResponse("home.html", context)
+    return render(request, "home.html")
 
 
 @app.get("/login", response_class=HTMLResponse)
 def login_get_view(request: Request):
-    context = {
-        "request": request
-    }
-    return templates.TemplateResponse("auth/login.html", context)
+    session_id = request.cookies.get("session_id") or None
+    return render(request, "auth/login.html", {"logged_in": session_id is not None})
 
 
 @app.post("/login", response_class=HTMLResponse)
@@ -52,20 +38,21 @@ def login_post_view(request: Request,
         "password": password
     }
     data, errors = utils.valid_schema_or_error(raw_data, UserLoginSchema)
+
     context = {
-        "request": request,
         "data": data,
         "errors": errors,
     }
-    return templates.TemplateResponse("auth/login.html", context)
+
+    if len(errors) > 0:
+        return render(request, "auth/login.html", context, status_code=400)
+    else:
+        return render(request, "auth/login.html", {"logged_in": True}, cookies=data)
 
 
 @app.get("/signup", response_class=HTMLResponse)
 def signup_get_view(request: Request):
-    context = {
-        "request": request
-    }
-    return templates.TemplateResponse("auth/signup.html", context)
+    return render(request, "auth/signup.html")
 
 
 @app.post("/signup", response_class=HTMLResponse)
@@ -80,12 +67,16 @@ def signup_post_view(request: Request,
         "password_confirm": password_confirm
     }
     data, errors = utils.valid_schema_or_error(raw_data, UserSIgnUpSchema)
+
     context = {
-        "request": request,
         "data": data,
         "errors": errors,
     }
-    return templates.TemplateResponse("auth/signup.html", context)
+
+    if len(errors) > 0:
+        return render(request, "auth/signup.html", context, status_code=400)
+    else:
+        return render(request, "auth/signup.html", context)
 
 
 @app.get("/users")
